@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "node .",
-    "test": "nodemon -w . -e *.ts -x ts-node index.ts"
+    "test": "nodemon -w . -e *.ts -x ts-node index.ts",
+    "build": "npm i -g pm2"
   },
   "keywords": [],
   "author": "",

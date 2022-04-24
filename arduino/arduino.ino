@@ -1,21 +1,18 @@
-/*
- * WebSocketClientSocketIO.ino
- *
- *  Created on: 06.06.2016
- *
- */
-
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
+// library: WebSockets by Markus Sattler Version 2.3.5
 #include <WebSocketsClient.h>
 #include <SocketIOclient.h>
 #include <Hash.h>
 
 SocketIOclient socketIO;
+HAS_SSL;
 
-const char *server = "192.168.122.63";
-int port = 8080;
+// const char *server = "192.168.43.126";
+// int port = 8080;
+// const char *server = "jemuran.vinz2k21.repl.co";
+// int port = 443;
 
 // id alat
 String id = "server12345";
@@ -120,7 +117,7 @@ void setup()
 {
    Serial.begin(9600);
    // Serial.begin(921600);
-   // Serial.setDebugOutput(true);
+   Serial.setDebugOutput(true);
 
    delay(500);
    Serial.println();
@@ -129,13 +126,14 @@ void setup()
    Serial.println();
 
    // mengoneksikan wifi
-   WiFi.begin("LAB WAN", "12345678");
+   WiFi.begin("Aziz", "");
    while (WiFi.status() != WL_CONNECTED) delay(100);
    String ip = WiFi.localIP().toString();
    Serial.printf("[SETUP] WiFi Connected %s\n", ip.c_str());
 
    // server address, port and URL
-   socketIO.begin(server, port, "/socket.io/?EIO=4");
+   // socketIO.begin(server, port, "/socket.io/?EIO=4");
+   socketIO.beginSSL(server, port, "/socket.io/?EIO=4");
    // event handler
    socketIO.onEvent(socketIOEvent);
 

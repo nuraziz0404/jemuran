@@ -1,0 +1,1 @@
+web: pm2 start . && pm2 log 0
