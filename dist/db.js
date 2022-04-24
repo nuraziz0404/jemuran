@@ -59,6 +59,7 @@ function upState(id, state, cuaca) {
         (0, exports.conn)(tableName)
             .insert(data)
             .then((e) => {
+            data.time = data.time.split(" ").reverse().join(" ");
             resolve([data]);
         })
             .catch((e) => {
