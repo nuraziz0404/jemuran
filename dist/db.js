@@ -68,6 +68,10 @@ function upState(id, state, cuaca) {
     });
 }
 exports.upState = upState;
+function fTime(time) {
+    let n = new Date(time).toLocaleString("en-GB", { hour12: false }).split(", ");
+    return [n[0].split("/").reverse().join("-"), n[1]].reverse().join(" ");
+}
 function getList(id) {
     return new Promise((resolve) => {
         (0, exports.conn)(tableName)
@@ -77,7 +81,7 @@ function getList(id) {
                 resolve([]);
             else
                 resolve(e.sort(timeSort).map((x) => {
-                    return { ...x, time: func.fTime(x.time) };
+                    return { ...x, time: fTime(x.time) };
                 }));
         })
             .catch((e) => {

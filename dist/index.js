@@ -49,7 +49,7 @@ function parseCookie(cookie) {
 }
 wss.on("connection", (client) => {
     if (args["debug"])
-        console.log("[client] connecting");
+        console.log("[client] connected");
     client.on("message", async (e) => {
         let data = {};
         try {
@@ -106,6 +106,6 @@ app.get("/logout", (req, res) => {
 });
 let srv = server.listen(parseInt(process.env.PORT) || 8080, "0.0.0.0", () => {
     let port = String(srv.address()["port"]);
-    console.log(`App listening on http://localhost${port == "80" ? "" : ":" + port}`);
+    console.log(`App listening on ${port == "443" ? "https://localhost" : port == "80" ? "http://localhost" : ("http://localhost:" + port)}`);
 });
 //# sourceMappingURL=index.js.map
