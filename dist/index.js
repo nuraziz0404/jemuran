@@ -28,7 +28,7 @@ const ejs_1 = __importDefault(require("ejs"));
 const http_1 = __importDefault(require("http"));
 const path_1 = __importDefault(require("path"));
 const db = __importStar(require("./db"));
-let args = process.argv.join(" ").split(" ").filter(e => e.startsWith("--")).reduce((a, b) => { return { ...a, [b.split(":")[0].slice(2)]: b.split(":")[1] || true }; }, {});
+let args = process.argv.join(" ").split(" ").filter(e => e.startsWith("--")).reduce((a, b) => { return { ...a, [b.split("=")[0].slice(2)]: b.split("=")[1] || true }; }, {});
 const app = (0, express_1.default)();
 app.use(express_1.default.urlencoded({ extended: true }));
 app.set("view engine", "html");
@@ -104,7 +104,7 @@ app.post("/", (req, res) => {
 app.get("/logout", (req, res) => {
     res.cookie("devid", "", { maxAge: 0 }).redirect("/");
 });
-let srv = server.listen(parseInt(process.env.PORT) || 8080, "0.0.0.0", () => {
+let srv = server.listen(parseInt(process.env.PORT || args['port']) || 8080, "0.0.0.0", () => {
     let port = String(srv.address()["port"]);
     console.log(`App listening on ${port == "443" ? "https://localhost" : port == "80" ? "http://localhost" : ("http://localhost:" + port)}`);
 });

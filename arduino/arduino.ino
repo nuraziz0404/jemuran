@@ -1,11 +1,19 @@
 #include <Arduino.h>
-#include <ESP8266WiFi.h>
+#include <WiFiManager.h>  // WiFiManager by tzapu Version 2.0.11-beta
 // library: ArduinoJson by Benoit Blanchon
 #include <ArduinoJson.h>
 // library: WebSockets by Markus Sattler Version 2.3.5
 #include <WebSocketsClient.h>
 #include <SocketIOclient.h>
 #include <Hash.h>
+
+// WiFi manager configuration
+WiFiManager wm;
+// #define WM_DEBUG_LEVEL 1
+#define config_ssid "Jemuran Configuration"
+#define config_pass ""
+// if the board disconnected to wifi mode than 30sec (30000ms), will switch to ap & config portal mode
+int lc = 0, to = 30000;
 
 SocketIOclient socketIO;
 
@@ -20,7 +28,7 @@ unsigned long lastChange = 0;
 unsigned long last = 0;
 
 // pin sensor hujan
-int sensorPin = D4;
+int sensorPin = D5;
 // pin dinamo controller
 int cw = D2;
 int ccw = D3;
@@ -45,8 +53,7 @@ void j()
    state = "jemur";
    Serial.println("menjemur");
 }
-void t()
-{
+void t() {
    digitalWrite(cw, 0);
    digitalWrite(ccw, 1);
    lastChange = millis();
@@ -95,19 +102,19 @@ void socketIOEvent(socketIOmessageType_t type, uint8_t *payload, size_t length)
       handler(payload);
       break;
    case sIOtype_ACK:
-      Serial.printf("[IOc] get ack: %u\n", length);
+      // Serial.printf("[IOc] get ack: %u\n", length);
       hexdump(payload, length);
       break;
    case sIOtype_ERROR:
-      Serial.printf("[IOc] get error: %u\n", length);
+      // Serial.printf("[IOc] get error: %u\n", length);
       hexdump(payload, length);
       break;
    case sIOtype_BINARY_EVENT:
-      Serial.printf("[IOc] get binary: %u\n", length);
+      // Serial.printf("[IOc] get binary: %u\n", length);
       hexdump(payload, length);
       break;
    case sIOtype_BINARY_ACK:
-      Serial.printf("[IOc] get binary ack: %u\n", length);
+      // Serial.printf("[IOc] get binary ack: %u\n", length);
       hexdump(payload, length);
       break;
    }
@@ -125,11 +132,24 @@ void setup()
    Serial.print("[SETUP] Starting...\n");
    Serial.println();
 
-   // mengoneksikan wifi
-   WiFi.begin("Aziz", "");
-   while (WiFi.status() != WL_CONNECTED) delay(100);
-   String ip = WiFi.localIP().toString();
-   Serial.printf("[SETUP] WiFi Connected %s\n", ip.c_str());
+   // starting wemos
+   WiFi.mode(WIFI_STA);
+   // wipe stored credentials for testing
+   // wm.resetSettings();
+   // async
+   wm.setConfigPortalBlocking(false);
+   wm.setConfigPortalTimeout(60);  // 1 minutes timeout
+   // wm.setDebugOutput(true);
+   // dark mode
+   wm.setDarkMode(true);
+
+   if (!wm.autoConnect(config_ssid, config_pass)) {
+      Serial.println("Failed to connect");
+      ESP.restart();
+   } else {
+      // if you get here you have connected to the WiFi
+      Serial.println("connected...yeey :)");
+   }
 
    // server address, port and URL
    Serial.print("WS Server: ");
@@ -152,11 +172,25 @@ void setup()
    cuaca = digitalRead(sensorPin) ? "cerah" : "hujan";
    lState = state;
    lCuaca = cuaca;
+   
+   pinMode(LED_BUILTIN, OUTPUT);
+   digitalWrite(LED_BUILTIN, 1);
 }
-void loop()
-{
+void loop() {
+   wm.process();
    socketIO.loop();
    uint64_t now = millis();
+
+   if (!WiFi.isConnected() && ((now - lc) > to)) {
+      wm.autoConnect(config_ssid, config_pass);
+      lc = now;
+   } else if (WiFi.isConnected()) lc = now;
+
+   if (wm.getConfigPortalActive()) digitalWrite(LED_BUILTIN, LOW);
+   else digitalWrite(LED_BUILTIN, HIGH);
+
+   if(socketIO.isConnected()) digitalWrite(LED_BUILTIN, 0);
+   else digitalWrite(LED_BUILTIN, 1);
 
    if (last == 0 || now - last > 1000)
    {
