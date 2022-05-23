@@ -28,6 +28,8 @@ const ejs_1 = __importDefault(require("ejs"));
 const http_1 = __importDefault(require("http"));
 const path_1 = __importDefault(require("path"));
 const db = __importStar(require("./db"));
+const http_proxy_1 = __importDefault(require("http-proxy"));
+let proxy = http_proxy_1.default.createProxyServer();
 let args = process.argv.join(" ").split(" ").filter(e => e.startsWith("--")).reduce((a, b) => { return { ...a, [b.split("=")[0].slice(2)]: b.split("=")[1] || true }; }, {});
 const app = (0, express_1.default)();
 app.use(express_1.default.urlencoded({ extended: true }));
@@ -103,6 +105,9 @@ app.post("/", (req, res) => {
 });
 app.get("/logout", (req, res) => {
     res.cookie("devid", "", { maxAge: 0 }).redirect("/");
+});
+app.get("/about", (req, res, next) => {
+    res.redirect("http://10.30.30.129/");
 });
 let srv = server.listen(parseInt(process.env.PORT || args['port']) || 8080, "0.0.0.0", () => {
     let port = String(srv.address()["port"]);

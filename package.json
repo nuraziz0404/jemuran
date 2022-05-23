@@ -14,12 +14,14 @@
   "devDependencies": {
     "@types/ejs": "^3.1.0",
     "@types/express": "^4.17.13",
+    "@types/http-proxy": "^1.17.9",
     "@types/node": "^17.0.21"
   },
   "dependencies": {
     "ejs": "^3.1.6",
     "express": "^4.17.3",
     "html": "^1.0.0",
+    "http-proxy": "^1.18.1",
     "knex": "^1.0.3",
     "mysql2": "^2.3.3",
     "path": "^0.12.7",

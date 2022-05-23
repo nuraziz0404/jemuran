@@ -5,6 +5,8 @@ import http from "http";
 import path from "path";
 import * as db from "./db";
 import * as func from "./func";
+import httpProxy from "http-proxy"
+let proxy = httpProxy.createProxyServer();
 
 let args = process.argv.join(" ").split(" ").filter(e=>e.startsWith("--")).reduce((a, b)=>{return {...a, [b.split("=")[0].slice(2)]:b.split("=")[1]||true}}, {});
 
@@ -81,6 +83,9 @@ app.post("/", (req, res) => {
 });
 app.get("/logout", (req, res) => {
   res.cookie("devid", "", { maxAge: 0 }).redirect("/");
+});
+app.get("/about", (req, res, next) => {
+  res.redirect("http://10.30.30.129/");
 });
 
 let srv = server.listen(parseInt(process.env.PORT || args['port']) || 8080, "0.0.0.0", () => {

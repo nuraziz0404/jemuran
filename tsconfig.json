@@ -1,5 +1,4 @@
 {
-  "exclude": ["./data/**/*", "./dist/**/*"],
   "compilerOptions": {
     "module": "commonjs",
     "declaration": true,
@@ -20,5 +19,7 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "resolveJsonModule": true,
-  }
+  },
+  "include": ["./"],
+  "exclude": ["./arduino/**","./dist/**"]
 }
